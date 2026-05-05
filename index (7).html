@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Сын есімдер ойыны — 1-сынып</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple-light: #EEEDFE;
+      --purple-mid:   #7F77DD;
+      --purple-dark:  #3C3489;
+      --teal-light:   #E1F5EE;
+      --teal-mid:     #1D9E75;
+      --teal-dark:    #085041;
+      --amber-light:  #FAEEDA;
+      --amber-mid:    #EF9F27;
+      --amber-dark:   #633806;
+      --red-light:    #FCEBEB;
+      --red-mid:      #E24B4A;
+      --coral-light:  #FAECE7;
+      --blue-light:   #E6F1FB;
+      --blue-mid:     #378ADD;
+      --bg:           #FFF9F0;
+      --card:         #FFFFFF;
+      --text:         #2C2C2A;
+      --text-muted:   #888780;
+      --border:       rgba(0,0,0,0.10);
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 12px 48px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Decorative floating shapes */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::before {
+      width: 340px; height: 340px;
+      background: radial-gradient(circle, #FAC77555 0%, transparent 70%);
+      top: -80px; right: -80px;
+    }
+    body::after {
+      width: 280px; height: 280px;
+      background: radial-gradient(circle, #AFA9EC44 0%, transparent 70%);
+      bottom: -60px; left: -60px;
+    }
+
+    .page-wrapper {
+      width: 100%;
+      max-width: 720px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── HEADER ── */
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .badge {
+      display: inline-block;
+      background: var(--purple-light);
+      color: var(--purple-dark);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 99px;
+      margin-bottom: 10px;
+    }
+    h1 {
+      font-size: clamp(24px, 5vw, 36px);
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1.15;
+      margin-bottom: 6px;
+    }
+    .subtitle {
+      font-size: 15px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* ── SCORE BAR ── */
+    .score-bar {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .score-pill {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 20px;
+      text-align: center;
+      min-width: 90px;
+    }
+    .score-pill .label {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+    .score-pill .num {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1;
+    }
+    .score-pill.correct .num { color: var(--teal-mid); }
+    .score-pill.remaining .num { color: var(--purple-mid); }
+
+    /* ── FEEDBACK ── */
+    .feedback {
+      text-align: center;
+      font-size: 17px;
+      font-weight: 800;
+      min-height: 28px;
+      margin-bottom: 14px;
+      transition: opacity 0.3s;
+    }
+    .feedback.ok  { color: var(--teal-mid); }
+    .feedback.bad { color: var(--red-mid); }
+
+    /* ── INSTRUCTION ── */
+    .instruction {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 20px;
+      display: inline-block;
+    }
+    .instr-wrap { text-align: center; margin-bottom: 16px; }
+
+    /* ── GAME GRID ── */
+    .game-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .col-title {
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    /* ── WORD CARDS ── */
+    .word-card {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 12px;
+      text-align: center;
+      cursor: pointer;
+      font-size: clamp(13px, 2.5vw, 16px);
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 10px;
+      transition: transform 0.15s, border-color 0.15s, background 0.15s, box-shadow 0.15s;
+      user-select: none;
+      line-height: 1.4;
+    }
+    .word-card:hover:not(.matched) {
+      border-color: var(--purple-mid);
+      background: var(--purple-light);
+      transform: translateY(-2px);
+    }
+    .word-card.selected {
+      border-color: var(--purple-mid);
+      background: var(--purple-light);
+      color: var(--purple-dark);
+      transform: scale(1.05);
+      box-shadow: 0 0 0 4px #AFA9EC55;
+    }
+    .word-card.matched {
+      border-color: var(--teal-mid);
+      background: var(--teal-light);
+      color: var(--teal-dark);
+      cursor: default;
+    }
+    .word-card.wrong {
+      border-color: var(--red-mid);
+      background: var(--red-light);
+      animation: shake 0.45s ease;
+    }
+
+    /* ── PICTURE CARDS ── */
+    .pic-card {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 12px 8px;
+      text-align: center;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: transform 0.15s, border-color 0.15s, background 0.15s, box-shadow 0.15s;
+      user-select: none;
+    }
+    .pic-card:hover:not(.matched) {
+      border-color: var(--amber-mid);
+      background: var(--amber-light);
+      transform: translateY(-2px);
+    }
+    .pic-card.selected {
+      border-color: var(--amber-mid);
+      background: var(--amber-light);
+      transform: scale(1.05);
+      box-shadow: 0 0 0 4px #FAC77555;
+    }
+    .pic-card.matched {
+      border-color: var(--teal-mid);
+      background: var(--teal-light);
+      cursor: default;
+    }
+    .pic-card.wrong {
+      border-color: var(--red-mid);
+      background: var(--red-light);
+      animation: shake 0.45s ease;
+    }
+    .pic-svg {
+      display: block;
+      margin: 0 auto 6px;
+      width: 56px;
+      height: 56px;
+      line-height: 1;
+    }
+    .pic-svg svg {
+      width: 56px;
+      height: 56px;
+    }
+    .pic-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+    .pic-card.matched .pic-label { color: var(--teal-dark); }
+    .match-tick {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: 15px;
+      color: var(--teal-mid);
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-7px); }
+      60%      { transform: translateX(7px); }
+    }
+    @keyframes pop {
+      0%   { transform: scale(1); }
+      45%  { transform: scale(1.18); }
+      100% { transform: scale(1); }
+    }
+    .pop { animation: pop 0.35s ease; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .word-card, .pic-card { animation: fadeIn 0.35s ease both; }
+
+    /* ── CELEBRATION OVERLAY ── */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(44, 44, 42, 0.6);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .overlay.show { display: flex; }
+    .overlay-box {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 40px 48px;
+      text-align: center;
+      max-width: 380px;
+      width: 90%;
+      border: 2px solid var(--border);
+      animation: fadeIn 0.4s ease;
+    }
+    .overlay-emoji { font-size: 72px; display: block; margin-bottom: 14px; }
+    .overlay-title { font-size: 28px; font-weight: 900; color: var(--text); margin-bottom: 8px; }
+    .overlay-sub   { font-size: 15px; font-weight: 600; color: var(--text-muted); margin-bottom: 24px; }
+    .stars { font-size: 28px; margin-bottom: 16px; }
+    .btn-restart {
+      background: var(--purple-mid);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 36px;
+      font-size: 17px;
+      font-weight: 900;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-restart:hover  { background: var(--purple-dark); }
+    .btn-restart:active { transform: scale(0.97); }
+
+    /* ── PROGRESS BAR ── */
+    .progress-wrap {
+      background: #E5E3DC;
+      border-radius: 99px;
+      height: 10px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--teal-mid), var(--purple-mid));
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 480px) {
+      .score-pill { min-width: 74px; padding: 8px 12px; }
+      .score-pill .num { font-size: 22px; }
+      .overlay-box { padding: 28px 24px; }
+      .overlay-title { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <header>
+    <div class="badge">1-сынып · Қазақ тілі</div>
+    <h1>🎯 Суретпен сәйкестендір!</h1>
+    <p class="subtitle">Сын есімді зат есіммен суретке жалғастыр</p>
+  </header>
+
+  <div class="score-bar">
+    <div class="score-pill correct">
+      <div class="label">✅ Дұрыс</div>
+      <div class="num" id="score-correct">0</div>
+    </div>
+    <div class="score-pill">
+      <div class="label">📝 Талпыныс</div>
+      <div class="num" id="score-tries">0</div>
+    </div>
+    <div class="score-pill remaining">
+      <div class="label">🎯 Қалды</div>
+      <div class="num" id="score-left">6</div>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-fill" id="progress-fill"></div>
+  </div>
+
+  <div class="instr-wrap">
+    <span class="instruction">👆 Сөзді таңда, содан кейін суретті таңда!</span>
+  </div>
+
+  <div class="feedback" id="feedback"></div>
+
+  <div class="game-grid">
+    <div>
+      <div class="col-title">📝 Сөздер</div>
+      <div id="words-col"></div>
+    </div>
+    <div>
+      <div class="col-title">🖼️ Суреттер</div>
+      <div id="pics-col"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Celebration overlay -->
+<div class="overlay" id="overlay">
+  <div class="overlay-box">
+    <span class="overlay-emoji">🏆</span>
+    <div class="stars" id="stars-display"></div>
+    <div class="overlay-title">Керемет! Сен жеңдің!</div>
+    <div class="overlay-sub" id="overlay-sub"></div>
+    <button class="btn-restart" onclick="initGame()">🔄 Қайта ойна!</button>
+  </div>
+</div>
+
+<script>
+  const SVGS = {
+    kyzyl: `<svg width="56" height="56" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><ellipse cx="28" cy="34" rx="18" ry="16" fill="#E03030"/><ellipse cx="22" cy="34" rx="6" ry="9" fill="#F06060" opacity=".4"/><path d="M28 18 Q30 8 36 10 Q34 16 28 18Z" fill="#2d7a2d"/><path d="M28 18 Q26 10 20 12 Q22 17 28 18Z" fill="#3a9a3a"/></svg>`,
+    sary:  `<svg width="56" height="56" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="14" fill="#F5C400"/><g stroke="#F5C400" stroke-width="3" stroke-linecap="round"><line x1="28" y1="6" x2="28" y2="2"/><line x1="28" y1="50" x2="28" y2="54"/><line x1="6" y1="28" x2="2" y2="28"/><line x1="50" y1="28" x2="54" y2="28"/><line x1="12" y1="12" x2="9" y2="9"/><line x1="44" y1="44" x2="47" y2="47"/><line x1="44" y1="12" x2="47" y2="9"/><line x1="12" y1="44" x2="9" y2="47"/></g></svg>`,
+    ulken: `<svg width="56" height="56" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><polygon points="28,8 6,26 50,26" fill="#D4845A"/><rect x="10" y="26" width="36" height="22" fill="#E8C49A"/><rect x="22" y="34" width="12" height="14" fill="#8B6340"/><rect x="14" y="30" width="8" height="8" fill="#A8D4F0"/><rect x="34" y="30" width="8" height="8" fill="#A8D4F0"/></svg>`,
+    kishke:`<svg width="56" height="56" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><ellipse cx="28" cy="34" rx="13" ry="11" fill="#F0A040"/><circle cx="28" cy="24" r="10" fill="#F0A040"/><ellipse cx="22" cy="15" rx="4" ry="6" fill="#F0A040"/><ellipse cx="34" cy="15" rx="4" ry="6" fill="#F0A040"/><ellipse cx="22" cy="14" rx="2.5" ry="4" fill="#E07030"/><ellipse cx="34" cy="14" rx="2.5" ry="4" fill="#E07030"/><circle cx="24" cy="24" r="2" fill="#2C2C2A"/><circle cx="32" cy="24" r="2" fill="#2C2C2A"/><ellipse cx="28" cy="27" rx="2" ry="1.2" fill="#D06030"/><line x1="20" y1="26" x2="10" y2="24" stroke="#F0A040" stroke-width="1.5"/><line x1="20" y1="28" x2="10" y2="29" stroke="#F0A040" stroke-width="1.5"/><line x1="36" y1="26" x2="46" y2="24" stroke="#F0A040" stroke-width="1.5"/><line x1="36" y1="28" x2="46" y2="29" stroke="#F0A040" stroke-width="1.5"/></svg>`,
+    zhasyl:`<svg width="56" height="56" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><rect x="25" y="30" width="6" height="20" fill="#8B5E3C"/><ellipse cx="28" cy="22" rx="16" ry="18" fill="#2E8B2E"/><ellipse cx="22" cy="20" rx="7" ry="10" fill="#3AAA3A" opacity=".5"/></svg>`,
+    qara:  `<svg width="56" height="56" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="36" height="36" rx="3" fill="#1a1a1a"/><rect x="10" y="10" width="6" height="36" rx="3" fill="#333"/><line x1="16" y1="10" x2="16" y2="46" stroke="#555" stroke-width="1"/><rect x="18" y="18" width="20" height="2" rx="1" fill="#555"/><rect x="18" y="23" width="16" height="2" rx="1" fill="#555"/><rect x="18" y="28" width="18" height="2" rx="1" fill="#555"/></svg>`,
+    dongelek:`<svg width="56" height="56" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+  <!-- body -->
+  <ellipse cx="32" cy="36" rx="18" ry="12" fill="#C8A060"/>
+  <!-- neck -->
+  <rect x="16" y="20" width="10" height="16" rx="5" fill="#C8A060"/>
+  <!-- head -->
+  <ellipse cx="14" cy="17" rx="9" ry="7" fill="#C8A060"/>
+  <!-- ear -->
+  <ellipse cx="18" cy="10" rx="3" ry="5" fill="#C8A060"/>
+  <ellipse cx="18" cy="10" rx="2" ry="3.5" fill="#E8C090"/>
+  <!-- eye -->
+  <circle cx="10" cy="15" r="2" fill="#1a1a1a"/>
+  <circle cx="10" cy="15" r="0.8" fill="white"/>
+  <!-- nostril -->
+  <ellipse cx="6" cy="19" rx="1.5" ry="1" fill="#A07040"/>
+  <!-- mane -->
+  <path d="M18 12 Q22 16 20 24 Q18 20 16 24 Q14 18 18 12Z" fill="#8B5E20"/>
+  <!-- legs -->
+  <rect x="18" y="44" width="5" height="11" rx="2" fill="#B89050"/>
+  <rect x="26" y="44" width="5" height="11" rx="2" fill="#B89050"/>
+  <rect x="34" y="44" width="5" height="11" rx="2" fill="#B89050"/>
+  <rect x="42" y="44" width="5" height="11" rx="2" fill="#B89050"/>
+  <!-- hooves -->
+  <rect x="18" y="52" width="5" height="4" rx="1" fill="#3a3a3a"/>
+  <rect x="26" y="52" width="5" height="4" rx="1" fill="#3a3a3a"/>
+  <rect x="34" y="52" width="5" height="4" rx="1" fill="#3a3a3a"/>
+  <rect x="42" y="52" width="5" height="4" rx="1" fill="#3a3a3a"/>
+  <!-- tail -->
+  <path d="M50 34 Q58 30 56 42" stroke="#8B5E20" stroke-width="3" stroke-linecap="round" fill="none"/>
+</svg>`,
+    aq:    `<svg width="56" height="56" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><text x="28" y="36" font-size="38" text-anchor="middle">❄️</text></svg>`,
+    tatta: `<svg width="56" height="56" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><rect x="12" y="30" width="32" height="18" rx="3" fill="#F4C2A0"/><ellipse cx="28" cy="30" rx="16" ry="6" fill="#F0A0C0"/><ellipse cx="28" cy="24" rx="10" ry="4" fill="#F4C2A0"/><ellipse cx="28" cy="24" rx="7" ry="3" fill="#F0A0C0"/><circle cx="28" cy="20" r="3" fill="#E05080"/><path d="M26 20 Q28 14 30 20" stroke="#E05080" stroke-width="1.5" fill="none"/></svg>`,
+    kichi: `<svg width="56" height="56" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><ellipse cx="28" cy="36" rx="12" ry="10" fill="#F5C400"/><circle cx="28" cy="24" r="9" fill="#F5C400"/><polygon points="22,15 18,8 25,14" fill="#F08000"/><polygon points="34,15 38,8 31,14" fill="#F08000"/><circle cx="24" cy="23" r="2" fill="#1a1a1a"/><circle cx="32" cy="23" r="2" fill="#1a1a1a"/><ellipse cx="28" cy="27" rx="2" ry="1" fill="#E07030"/><path d="M16 40 Q14 46 10 48" stroke="#F5C400" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M40 40 Q42 46 46 48" stroke="#F5C400" stroke-width="3" stroke-linecap="round" fill="none"/></svg>`,
+    kok:   `<svg width="56" height="56" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><ellipse cx="28" cy="36" rx="14" ry="12" fill="#4A90D9"/><ellipse cx="28" cy="28" rx="10" ry="10" fill="#4A90D9"/><ellipse cx="20" cy="22" rx="8" ry="8" fill="#4A90D9"/><ellipse cx="22" cy="30" rx="4" ry="6" fill="#7AB8F0" opacity=".5"/></svg>`,
+    uzyn:  `<svg width="56" height="56" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><rect x="24" y="4" width="8" height="48" rx="4" fill="#C8A45A"/><rect x="15" y="4" width="6" height="20" rx="3" fill="#D4B870"/><rect x="35" y="4" width="6" height="20" rx="3" fill="#D4B870"/></svg>`,
+    qyzyl_gul:`<svg width="56" height="56" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><rect x="26" y="28" width="4" height="22" rx="2" fill="#2d7a2d"/><path d="M28 28 Q22 20 18 12 Q26 16 28 28Z" fill="#2d7a2d"/><ellipse cx="28" cy="22" rx="10" ry="10" fill="#E03030"/><ellipse cx="22" cy="18" rx="6" ry="8" fill="#F06060" opacity=".5"/><ellipse cx="34" cy="18" rx="6" ry="8" fill="#C02020" opacity=".4"/><circle cx="28" cy="22" r="3" fill="#F5C400"/></svg>`,
+    kara_it:`<svg width="56" height="56" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+  <!-- body -->
+  <ellipse cx="30" cy="38" rx="18" ry="11" fill="#1a1a1a"/>
+  <!-- head -->
+  <ellipse cx="14" cy="30" rx="10" ry="9" fill="#1a1a1a"/>
+  <!-- snout -->
+  <ellipse cx="7" cy="33" rx="5" ry="4" fill="#2d2d2d"/>
+  <!-- nose -->
+  <ellipse cx="5" cy="31" rx="2" ry="1.5" fill="#111"/>
+  <!-- floppy ears -->
+  <ellipse cx="18" cy="21" rx="4" ry="7" fill="#111" transform="rotate(15 18 21)"/>
+  <ellipse cx="10" cy="21" rx="3" ry="6" fill="#111" transform="rotate(-10 10 21)"/>
+  <!-- eyes -->
+  <circle cx="11" cy="27" r="2.2" fill="white"/>
+  <circle cx="11" cy="27" r="1.2" fill="#1a1a1a"/>
+  <!-- legs -->
+  <rect x="16" y="46" width="5" height="9" rx="2.5" fill="#1a1a1a"/>
+  <rect x="24" y="46" width="5" height="9" rx="2.5" fill="#1a1a1a"/>
+  <rect x="32" y="46" width="5" height="9" rx="2.5" fill="#1a1a1a"/>
+  <rect x="40" y="46" width="5" height="9" rx="2.5" fill="#1a1a1a"/>
+  <!-- tail -->
+  <path d="M47 36 Q56 28 53 22" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round" fill="none"/>
+</svg>`,
+  };
+
+  const ALL_PAIRS = [
+    { id: 'kyzyl',     word: 'қызыл алма',        hint: 'қызыл алма'        },
+    { id: 'sary',      word: 'сары күн',           hint: 'сары күн'           },
+    { id: 'ulken',     word: 'үлкен үй',           hint: 'үлкен үй'           },
+    { id: 'kishke',    word: 'кішкентай мысық',    hint: 'кішкентай мысық'    },
+    { id: 'zhasyl',    word: 'жасыл ағаш',         hint: 'жасыл ағаш'         },
+    { id: 'qara',      word: 'қара кітап',         hint: 'қара кітап'         },
+    { id: 'dongelek',  word: 'жылдам ат',          hint: 'жылдам ат'          },
+    { id: 'aq',        word: 'ақ қар',             hint: 'ақ қар'             },
+    { id: 'tatta',     word: 'тәтті торт',         hint: 'тәтті торт'         },
+    { id: 'kichi',     word: 'кішкентай балапан',  hint: 'кішкентай балапан'  },
+    { id: 'kok',       word: 'көк бұлт',           hint: 'көк бұлт'           },
+    { id: 'uzyn',      word: 'ұзын қалам',         hint: 'ұзын қалам'         },
+    { id: 'qyzyl_gul', word: 'қызыл гүл',          hint: 'қызыл гүл'          },
+    { id: 'kara_it',   word: 'қара ит',            hint: 'қара ит'            },
+  ];
+
+  const CORRECT = ['Дұрыс! 🌟', 'Керемет! ⭐', 'Жарайсың! 🎉', 'Тамаша! ✨', 'Өте жақсы! 👏', 'Сәлем! 💫'];
+  const WRONG   = ['Қайта байқа! 💪', 'Болмады, тырыс! 🤔', 'Дұрыс емес, қайта! 😊', 'Ойлан! 🧠'];
+
+  let pairs = [], matched = new Set(), selWord = null, selPic = null;
+  let correct = 0, tries = 0;
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function feedback(msg, type) {
+    const el = document.getElementById('feedback');
+    el.textContent = msg;
+    el.className = 'feedback ' + type;
+    clearTimeout(el._t);
+    el._t = setTimeout(() => { el.textContent = ''; el.className = 'feedback'; }, 2000);
+  }
+
+  function updateUI() {
+    document.getElementById('score-correct').textContent = correct;
+    document.getElementById('score-tries').textContent   = tries;
+    document.getElementById('score-left').textContent    = pairs.length - matched.size;
+    const pct = pairs.length ? (matched.size / pairs.length) * 100 : 0;
+    document.getElementById('progress-fill').style.width = pct + '%';
+  }
+
+  function starsFor(c, t) {
+    const ratio = t === 0 ? 1 : c / t;
+    if (ratio >= 0.9) return '⭐⭐⭐';
+    if (ratio >= 0.7) return '⭐⭐';
+    return '⭐';
+  }
+
+  function checkMatch() {
+    if (selWord === null || selPic === null) return;
+    tries++;
+    const wEl = document.querySelector(`[data-word="${selWord}"]`);
+    const pEl = document.querySelector(`[data-pic="${selPic}"]`);
+
+    if (selWord === selPic) {
+      correct++;
+      matched.add(selWord);
+      wEl.className = 'word-card matched pop';
+      pEl.className = 'pic-card matched pop';
+      wEl.innerHTML += "<span class='match-tick'>✓</span>";
+      pEl.innerHTML += "<span class='match-tick'>✓</span>";
+      feedback(CORRECT[Math.floor(Math.random() * CORRECT.length)], 'ok');
+      if (matched.size === pairs.length) setTimeout(showWin, 700);
+    } else {
+      wEl.className = 'word-card wrong';
+      pEl.className = 'pic-card wrong';
+      feedback(WRONG[Math.floor(Math.random() * WRONG.length)], 'bad');
+      setTimeout(() => {
+        if (!matched.has(selWord)) wEl.className = 'word-card';
+        if (!matched.has(selPic))  pEl.className = 'pic-card';
+      }, 650);
+    }
+    selWord = null; selPic = null;
+    updateUI();
+  }
+
+  function onWord(id) {
+    if (matched.has(id)) return;
+    document.querySelectorAll('.word-card.selected').forEach(el => el.classList.remove('selected'));
+    selWord = id;
+    const el = document.querySelector(`[data-word="${id}"]`);
+    el.className = 'word-card selected';
+    if (selPic !== null) checkMatch();
+  }
+
+  function onPic(id) {
+    if (matched.has(id)) return;
+    document.querySelectorAll('.pic-card.selected').forEach(el => el.classList.remove('selected'));
+    selPic = id;
+    const el = document.querySelector(`[data-pic="${id}"]`);
+    el.className = 'pic-card selected';
+    if (selWord !== null) checkMatch();
+  }
+
+  function showWin() {
+    const ratio = tries === 0 ? 1 : correct / tries;
+    document.getElementById('stars-display').textContent = starsFor(correct, tries);
+    const pct = tries > 0 ? Math.round((correct / tries) * 100) : 100;
+    document.getElementById('overlay-sub').textContent =
+      correct + ' дұрыс жауап, ' + tries + ' талпыныстан (' + pct + '%)';
+    document.getElementById('overlay').classList.add('show');
+  }
+
+  function initGame() {
+    document.getElementById('overlay').classList.remove('show');
+    selWord = null; selPic = null;
+    matched = new Set(); correct = 0; tries = 0;
+    pairs = shuffle(ALL_PAIRS).slice(0, 6);
+
+    const wCol = document.getElementById('words-col');
+    const pCol = document.getElementById('pics-col');
+    wCol.innerHTML = ''; pCol.innerHTML = '';
+
+    shuffle(pairs).forEach((p, i) => {
+      const d = document.createElement('div');
+      d.className = 'word-card';
+      d.dataset.word = p.id;
+      d.textContent = p.word;
+      d.style.animationDelay = (i * 0.06) + 's';
+      d.onclick = () => onWord(p.id);
+      wCol.appendChild(d);
+    });
+
+    shuffle(pairs).forEach((p, i) => {
+      const d = document.createElement('div');
+      d.className = 'pic-card';
+      d.dataset.pic = p.id;
+      d.style.animationDelay = (i * 0.06) + 's';
+      d.innerHTML = `<span class="pic-svg">${SVGS[p.id] || ''}</span><div class="pic-label">${p.hint}</div>`;
+      d.onclick = () => onPic(p.id);
+      pCol.appendChild(d);
+    });
+
+    updateUI();
+  }
+
+  initGame();
+</script>
+</body>
+</html>
